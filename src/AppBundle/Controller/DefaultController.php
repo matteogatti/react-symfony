@@ -2,20 +2,83 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Todo;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends Controller
 {
     /**
-     * @Route("/", name="homepage")
+     * @Route("/xhr/list", name="list", methods={"GET"})
      */
-    public function indexAction(Request $request)
+    public function listAction()
     {
-        // replace this example code with whatever you need
-        return $this->render('default/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
+        $todos = $this->getDoctrine()->getRepository(Todo::class)->findAllToArray();
+
+        return new JsonResponse($todos);
+    }
+
+    /**
+     * @Route("/xhr/add", name="add", methods={"POST"})
+     */
+    public function addAction(Request $request)
+    {
+        $status = false;
+        $message = null;
+
+        $json = json_decode($request->getContent(), true);
+
+        if (isset($json['todo'])) {
+            $todo = new Todo();
+            $todo->setTodo($json['todo']);
+
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($todo);
+                $em->flush();
+
+                $status = true;
+            } catch (Exception $e) {
+                $message = $e->getMessage();
+            }
+        }
+
+        return new JsonResponse([
+            'status'  => $status,
+            'message' => $message
+        ]);
+    }
+
+    /**
+     * @Route("/xhr/delete", name="delete", methods={"DELETE"})
+     */
+    public function deleteAction(Request $request)
+    {
+        $status = false;
+        $message = null;
+
+        $json = json_decode($request->getContent(), true);
+
+        if (isset($json['id'])) {
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $todo = $em->getRepository(Todo::class)->find($json['id']);
+
+                $em->remove($todo);
+                $em->flush();
+
+                $status = true;
+            } catch (Exception $e) {
+                $message = $e->getMessage();
+            }
+        }
+
+        return new JsonResponse([
+            'status'  => $status,
+            'message' => $message
         ]);
     }
 }
