@@ -1,0 +1,13 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h1>UALA TODOLIST</h1>
+
+        <div id="todo"></div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {% include 'AppBundle:Default:todo.html.twig' %}
+{% endblock %}
