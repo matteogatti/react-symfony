@@ -35,12 +35,16 @@ class DefaultController extends Controller
      */
     public function addAction(Request $request)
     {
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse();
+        }
+
         $status = false;
-        $message = null;
+        $result = null;
 
         $json = json_decode($request->getContent(), true);
 
-        if (isset($json['todo'])) {
+        if ($json['todo'] != '') {
             $todo = new Todo();
             $todo->setTodo($json['todo']);
 
@@ -50,44 +54,47 @@ class DefaultController extends Controller
                 $em->flush();
 
                 $status = true;
+                $result = ['id' => $todo->getId()];
             } catch (Exception $e) {
-                $message = $e->getMessage();
+                $result = $e->getMessage();
             }
         }
 
         return new JsonResponse([
             'status'  => $status,
-            'message' => $message
+            'result'  => $result
         ]);
     }
 
     /**
-     * @Route("/xhr/delete", name="delete", methods={"DELETE"})
+     * @Route("/xhr/delete/{id}", name="delete", methods={"DELETE"})
      */
-    public function deleteAction(Request $request)
+    public function deleteAction($id, Request $request)
     {
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse();
+        }
+
         $status = false;
-        $message = null;
+        $result = null;
 
-        $json = json_decode($request->getContent(), true);
-
-        if (isset($json['id'])) {
+        if ($id) {
             try {
                 $em = $this->getDoctrine()->getManager();
-                $todo = $em->getRepository(Todo::class)->find($json['id']);
+                $todo = $em->getRepository(Todo::class)->find($id);
 
                 $em->remove($todo);
                 $em->flush();
 
                 $status = true;
             } catch (Exception $e) {
-                $message = $e->getMessage();
+                $result = $e->getMessage();
             }
         }
 
         return new JsonResponse([
             'status'  => $status,
-            'message' => $message
+            'result'  => $result
         ]);
     }
 }
