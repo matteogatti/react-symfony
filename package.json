@@ -1,0 +1,23 @@
+{
+  "name": "UALA TODOList",
+  "version": "1.0.0",
+  "description": "Creare una semplice web app per gestire dei ToDo con queste caratteristiche:  - Il frontend deve essere creato con React  - Il backend deve essere in php (framework a piacere) e deve permettere di creare e cancellare i to do  - Il tutto deve girare all'interno di un container di docker  - La To Do List deve essere salvata su file system (modalità a piacere) ma all'esterno del container di docker",
+  "main": "todolist.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "babel-cli": "^6.23.0",
+    "babel-preset-env": "^1.2.1",
+    "babel-preset-react": "^6.23.0"
+  },
+  "babel": {
+    "presets": ["react"]
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
